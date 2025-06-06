@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const loginSchema = z.object({
+export const loginFormSchema = z.object({
   usernameEmail: z
     .string()
     .min(1, { message: "You must enter your username or email" }),
