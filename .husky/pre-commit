@@ -1,4 +1,8 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+echo "🛠 Fixing lint issues..."
+npm run lint
 
-npx lint-staged
+echo "💅 Formatting with Prettier..."
+npm run format:fix
+
+echo "🧪 Running tests..."
+npm run test || exit 1
