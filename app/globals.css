@@ -1,4 +1,10 @@
-@import "tailwindcss";
+/*
+  The following directives are for Tailwind CSS and must be processed with a build tool like PostCSS.
+  If you see "Unknown at rule @tailwind", ensure your build setup is correct.
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
