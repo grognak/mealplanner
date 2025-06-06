@@ -1,8 +1,7 @@
-echo "🛠 Fixing lint issues..."
-npm run lint
+#!/bin/sh
+npx lint-staged || exit 1
 
-echo "💅 Formatting with Prettier..."
-npm run format:fix
+echo "\n🧪 Running tests..."
+npx vitest --config=vitest.config.ts run || exit 1=
 
-echo "🧪 Running tests..."
-npm run test || exit 1
+echo "\n✅ All tests passed!"
