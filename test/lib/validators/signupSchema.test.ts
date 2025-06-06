@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { signupFormSchema } from "@/lib/validators/signupSchema";
+import { signupFormSchema } from "../../../lib/validators/signupSchema";
 
 describe("signupSchema", () => {
   it("validates correct input", () => {

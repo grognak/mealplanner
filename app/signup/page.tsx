@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 export default function SignupPage() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
@@ -26,8 +28,22 @@ export default function SignupPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof signupFormSchema>) {
+  async function onSubmit(values: z.infer<typeof signupFormSchema>) {
     console.log(values);
+
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    });
+
+    if (res.ok) {
+      console.log("Signup successful");
+      router.push("/login");
+    } else {
+      const error = await res.json();
+      console.error("Signup failed: ", error);
+    }
   }
 
   return (

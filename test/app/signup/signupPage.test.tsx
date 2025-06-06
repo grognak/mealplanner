@@ -1,11 +1,24 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import SignupPage from "@/app/signup/page";
+import SignupPage from "../../../app/signup/page";
 import { vi } from "vitest";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
+
+beforeEach(() => {
+  global.fetch = vi.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ success: true }),
+    }),
+  ) as unknown as typeof fetch;
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("SignupForm", () => {
   it("displays validation errors when submitting empty form", async () => {
@@ -42,6 +55,13 @@ describe("SignupForm", () => {
       password: "password123",
       confirm: "password123",
     });
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/auth/signup",
+      expect.objectContaining({
+        method: "POST",
+      }),
+    );
 
     logSpy.mockRestore();
   });
