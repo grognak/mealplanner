@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { loginFormSchema } from "../../../lib/validators/loginSchema";
 
-describe("signupSchema", () => {
+describe("loginSchema", () => {
   it("validates correct input", () => {
     const result = loginFormSchema.safeParse({
       identifier: "testuser",
