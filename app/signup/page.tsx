@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -15,9 +16,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { EyeOpenIcon, EyeClosedIcon } from "@radix-ui/react-icons";
 
 export default function SignupPage() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
@@ -45,6 +49,10 @@ export default function SignupPage() {
       console.error("Signup failed: ", error);
     }
   }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <div className="max-w-md mx-auto mt-16 p-6 border rounded-2xl shadow-lg space-y-6">
@@ -86,9 +94,24 @@ export default function SignupPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Password" {...field} />
-                  </FormControl>
+                  <div className="relative">
+                    <FormControl>
+                      <Input
+                        placeholder="Password"
+                        {...field}
+                        type={showPassword ? "text" : "password"}
+                      />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2"
+                      onClick={togglePasswordVisibility}
+                    >
+                      {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -100,7 +123,11 @@ export default function SignupPage() {
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="Confirm Password" {...field} />
+                    <Input
+                      placeholder="Confirm Password"
+                      {...field}
+                      type={showPassword ? "text" : "password"}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
