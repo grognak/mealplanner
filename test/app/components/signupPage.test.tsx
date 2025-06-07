@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SignupPage from "../../../app/signup/page";
 import { vi } from "vitest";
@@ -28,5 +28,13 @@ describe("SignupForm", () => {
 
     expect(await screen.findAllByText(/must be at least/)).toHaveLength(2);
     expect(screen.getByText(/invalid email/i)).toBeInTheDocument();
+  });
+
+  it("toggles password visibility", async () => {
+    render(<SignupPage />);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const toggleButton = screen.getByRole("button", { name: "" }); // eye icon has no accessible name
+    fireEvent.click(toggleButton);
+    expect(passwordInput).toHaveAttribute("type", "text");
   });
 });

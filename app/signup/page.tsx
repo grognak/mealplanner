@@ -91,30 +91,34 @@ export default function SignupPage() {
             <FormField
               control={form.control}
               name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <div className="relative">
-                    <FormControl>
-                      <Input
-                        placeholder="Password"
-                        {...field}
-                        type={showPassword ? "text" : "password"}
-                      />
-                    </FormControl>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2"
-                      onClick={togglePasswordVisibility}
-                    >
-                      {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
-                    </Button>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const inputId = "password-input";
+                return (
+                  <FormItem>
+                    <FormLabel htmlFor={inputId}>Password</FormLabel>
+                    <div className="relative">
+                      <FormControl>
+                        <Input
+                          placeholder="Password"
+                          {...field}
+                          name="password"
+                          type={showPassword ? "text" : "password"}
+                        />
+                      </FormControl>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-2 top-1/2 -translate-y-1/2"
+                        onClick={togglePasswordVisibility}
+                      >
+                        {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
+                      </Button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
             <FormField
               control={form.control}
