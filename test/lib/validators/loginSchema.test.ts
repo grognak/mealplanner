@@ -4,7 +4,7 @@ import { loginFormSchema } from "../../../lib/validators/loginSchema";
 describe("signupSchema", () => {
   it("validates correct input", () => {
     const result = loginFormSchema.safeParse({
-      usernameEmail: "testuser",
+      identifier: "testuser",
       password: "password123",
     });
 
