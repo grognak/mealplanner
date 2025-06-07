@@ -80,24 +80,24 @@ export default function LoginPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <div className="relative">
+                  <div className="relative">
+                    <FormControl>
                       <Input
                         placeholder="Password"
                         {...field}
                         type={showPassword ? "text" : "password"}
                       />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-2 top-1/2 -translate-y-1/2"
-                        onClick={togglePasswordVisibility}
-                      >
-                        {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
-                      </Button>
-                    </div>
-                  </FormControl>
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2"
+                      onClick={togglePasswordVisibility}
+                    >
+                      {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
