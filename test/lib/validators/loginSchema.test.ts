@@ -1,0 +1,13 @@
+import { describe, it, expect } from "vitest";
+import { loginFormSchema } from "../../../lib/validators/loginSchema";
+
+describe("loginSchema", () => {
+  it("validates correct input", () => {
+    const result = loginFormSchema.safeParse({
+      identifier: "testuser",
+      password: "password123",
+    });
+
+    expect(result.success).toBe(true);
+  });
+});
