@@ -1,8 +1,7 @@
 #!/bin/sh
+npx lint-staged || exit 1
 
 npx prisma migrate deploy
-
-npx lint-staged || exit 1
 
 echo "\n🧪 Running tests..."
 npx vitest --config=vitest.config.ts run || exit 1=
