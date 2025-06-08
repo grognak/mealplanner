@@ -1,0 +1,62 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import MealCardComponent from "@/components/MealCard";
+
+export default function RecipeBox() {
+  const { data: session, status } = useSession();
+  const [meals, setMeals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user.id) {
+      const fetchMeals = async () => {
+        try {
+          const response = await fetch(`/api/meals`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${session.user.id}`,
+            },
+          });
+
+          console.log("Response from server: ", response);
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch meals");
+          }
+
+          const data = await response.json();
+          setMeals(data);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchMeals();
+    } else if (status === "unauthenticated") {
+      setError("You must be logged in to see your meals.");
+      setLoading(false);
+    }
+  }, [status, session]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div className="recipe-box">
+      {meals.length === 0 ? (
+        <div>No meals found.</div>
+      ) : (
+        <div className="meal-grid">
+          {meals.map((meal) => (
+            <MealCardComponent key={meal.id} slug={meal} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
