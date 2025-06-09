@@ -8,7 +8,7 @@ export default function RecipeBox() {
   const { data: session, status } = useSession();
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (status === "authenticated" && session?.user.id) {
@@ -52,8 +52,8 @@ export default function RecipeBox() {
         <div>No meals found.</div>
       ) : (
         <div className="meal-grid">
-          {meals.map((meal) => (
-            <MealCardComponent key={meal.id} slug={meal} />
+          {meals.map((meal, idx) => (
+            <MealCardComponent key={idx} slug={meal} />
           ))}
         </div>
       )}
