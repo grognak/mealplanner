@@ -9,12 +9,14 @@ export const mealFormSchema = z.object({
     .string()
     .url("Image must be a valid URL")
     .optional()
-    .or(z.literal("")),
+    .nullable()
+    .transform((val) => val ?? ""),
   recipe_link: z
     .string()
     .url("Recipe must be a valid URL")
     .optional()
-    .or(z.literal("")),
+    .nullable()
+    .transform((val) => val ?? ""),
   userId: z.string().optional(),
 });
 
