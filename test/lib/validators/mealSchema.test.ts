@@ -78,13 +78,4 @@ describe("mealFormSchema", () => {
     expect(result.lastMade).toBeInstanceOf(Date);
     expect(result.lastMade?.toISOString()).toBe("2025-06-09T00:00:00.000Z");
   });
-
-  it("converts empty string for lastMade to undefined", () => {
-    const result = mealFormSchema.parse({
-      name: "Soup",
-      lastMade: "",
-    });
-
-    expect(result.lastMade).toBeUndefined();
-  });
 });

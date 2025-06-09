@@ -3,11 +3,7 @@ import { z } from "zod";
 export const mealFormSchema = z.object({
   name: z.string().min(1, "Meal name is required"),
   tags: z.array(z.string()).optional(),
-  lastMade: z.preprocess((val) => {
-    if (typeof val === "string" && val.trim() === "") return undefined;
-    if (typeof val === "string") return new Date(val);
-    return val;
-  }, z.date().optional()),
+  lastMade: z.coerce.date().optional(),
   notes: z.array(z.string()).optional(),
   img_file: z
     .string()
@@ -22,4 +18,4 @@ export const mealFormSchema = z.object({
   userId: z.string().optional(),
 });
 
-export type MealFormData = z.infer<typeof mealFormSchema>;
+export type MealFormData = z.output<typeof mealFormSchema>;
