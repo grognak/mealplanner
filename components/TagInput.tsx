@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 export default function TagInput({
   value,
   onChange,
@@ -5,7 +9,7 @@ export default function TagInput({
   value: string[];
   onChange: (v: string[]) => void;
 }) {
-  const [inputValue, setInputValue] = React.useState("");
+  const [inputValue, setInputValue] = useState("");
 
   const addTag = (tag: string) => {
     const trimmed = tag.trim();

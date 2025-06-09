@@ -48,18 +48,21 @@ export default function MealForm({ defaultMeal, onSubmit }: MealFormProps) {
     formState: { errors }, // eslint-disable-line
   } = form;
 
-  const notesFieldArray = useFieldArray({
+  const notesFieldArray = useFieldArray<MealFormData, "notes">({
     control,
-    name: "notes",
+    name: "notes" as const,
   });
 
-  const handleSubmit = (data: MealFormData) => {
+  const onValidSubmit = (data: MealFormData) => {
     onSubmit(data);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-lg">
+      <form
+        onSubmit={handleSubmit(onValidSubmit)}
+        className="space-y-6 max-w-lg"
+      >
         {/* Name */}
         <FormField
           control={control}
@@ -134,7 +137,6 @@ export default function MealForm({ defaultMeal, onSubmit }: MealFormProps) {
                 <FormControl>
                   <Input
                     {...register(`notes.${index}` as const)}
-                    defaultValue={field}
                     placeholder={`Note #${index + 1}`}
                   />
                 </FormControl>

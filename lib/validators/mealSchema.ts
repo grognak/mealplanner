@@ -18,4 +18,4 @@ export const mealFormSchema = z.object({
   userId: z.string().optional(),
 });
 
-export type MealFormData = z.output<typeof mealFormSchema>;
+export type MealFormData = z.infer<typeof mealFormSchema>;
