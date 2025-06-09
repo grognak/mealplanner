@@ -22,8 +22,8 @@ export default function MealCardComponent({ slug }: MealCardProps) {
           <CardTitle>{meal.name}</CardTitle>
         </CardHeader>
         <CardFooter>
-          {meal.tags.map((tag) => (
-            <span className="text-sm font-light" key={tag.id}>
+          {meal.tags.map((tag, idx) => (
+            <span className="text-sm font-light" key={idx}>
               #{tag}{" "}
             </span>
           ))}
