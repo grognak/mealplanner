@@ -3,12 +3,17 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import MealCardComponent from "@/components/MealCard";
+import MealForm from "./MealForm";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import type { MealFormData } from "@/lib/validators/mealSchema";
 
 export default function RecipeBox() {
   const { data: session, status } = useSession();
-  const [meals, setMeals] = useState([]);
+  const [meals, setMeals] = useState<MealFormData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const [selectedMeal, setSelectedMeal] = useState<MealFormData | null>(null);
 
   useEffect(() => {
     if (status === "authenticated" && session?.user.id) {
@@ -30,7 +35,11 @@ export default function RecipeBox() {
           const data = await response.json();
           setMeals(data);
         } catch (err) {
-          setError(err.message);
+          if (err instanceof Error) {
+            setError(err.message);
+          } else {
+            setError("An unknown error occurred.");
+          }
         } finally {
           setLoading(false);
         }
@@ -43,20 +52,42 @@ export default function RecipeBox() {
     }
   }, [status, session]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  const handleMealSelect = (meal: MealFormData) => {
+    setSelectedMeal(meal);
+  };
+
+  const handleFormSubmit = async (data: MealFormData) => {
+    // update or create logic here
+    console.log("Submitting meal: ", data);
+    setSelectedMeal(null);
+  };
 
   return (
     <div className="recipe-box">
-      {meals.length === 0 ? (
-        <div>No meals found.</div>
-      ) : (
-        <div className="meal-grid">
-          {meals.map((meal) => (
-            <MealCardComponent key={meal.id} slug={meal} />
-          ))}
-        </div>
-      )}
+      {loading && <div>Loading...</div>}
+      {error && <div>Error: {error}</div>}
+      {!loading && !error && meals.length === 0 && <div>No meals found.</div>}
+
+      <div className="meal-grid">
+        {meals.map((meal) => (
+          <MealCardComponent
+            key={meal.name}
+            slug={meal}
+            onClick={() => handleMealSelect(meal)}
+          />
+        ))}
+      </div>
+
+      <Dialog
+        open={!!selectedMeal}
+        onOpenChange={(open) => !open && setSelectedMeal(null)}
+      >
+        <DialogContent>
+          {selectedMeal && (
+            <MealForm defaultMeal={selectedMeal} onSubmit={handleFormSubmit} />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
