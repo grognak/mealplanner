@@ -2,9 +2,9 @@ import { z } from "zod";
 
 export const mealFormSchema = z.object({
   name: z.string().min(1, "Meal name is required"),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()),
   lastMade: z.coerce.date().optional(),
-  notes: z.array(z.string()).optional(),
+  notes: z.array(z.string()),
   img_file: z
     .string()
     .url("Image must be a valid URL")

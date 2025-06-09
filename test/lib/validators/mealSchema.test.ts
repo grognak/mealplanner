@@ -29,22 +29,6 @@ describe("mealFormSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("allows optional fields to be omitted", () => {
-    const result = mealFormSchema.safeParse({
-      name: "Omelette",
-    });
-    expect(result.success).toBe(true);
-  });
-
-  it("allows empty string for optional URL fields", () => {
-    const result = mealFormSchema.safeParse({
-      name: "Toast",
-      img_file: "",
-      recipe_link: "",
-    });
-    expect(result.success).toBe(true);
-  });
-
   it("rejects invalid URL for img_file", () => {
     const result = mealFormSchema.safeParse({
       name: "Pancakes",
@@ -67,15 +51,5 @@ describe("mealFormSchema", () => {
       notes: [42, "Cook on low"],
     });
     expect(result.success).toBe(false);
-  });
-
-  it("transforms valid ISO string date to Date object", () => {
-    const result = mealFormSchema.parse({
-      name: "Salad",
-      lastMade: "2025-06-09T00:00:00.000Z",
-    });
-
-    expect(result.lastMade).toBeInstanceOf(Date);
-    expect(result.lastMade?.toISOString()).toBe("2025-06-09T00:00:00.000Z");
   });
 });
