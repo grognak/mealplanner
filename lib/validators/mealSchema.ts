@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const mealFormSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Meal name is required"),
   tags: z.array(z.string()).optional(),
   lastMade: z.preprocess((val) => {
