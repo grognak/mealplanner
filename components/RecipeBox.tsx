@@ -24,7 +24,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 export default function RecipeBox() {
@@ -81,10 +80,23 @@ export default function RecipeBox() {
     setSelectedMeal(meal);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    if (!deleteMeal) return;
+
     console.log("Delete Meal Button clicked: ", JSON.stringify(deleteMeal));
 
-    setDeleteMeal(null);
+    try {
+      const res = await fetch(`/api/meals/${deleteMeal.id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Delete failed");
+
+      setMeals((prev) => prev.filter((meal) => meal.id !== deleteMeal.id));
+      setDeleteMeal(null);
+    } catch (err) {
+      console.error("Failed to delete meal:", err);
+    }
   };
 
   const handleFormSubmit = async (data: MealFormData) => {
@@ -161,14 +173,14 @@ export default function RecipeBox() {
         open={!!selectedMeal}
         onOpenChange={(open) => !open && setSelectedMeal(null)}
       >
-        <DialogHeader>
-          <DialogTitle>{"Meal Details"}</DialogTitle>
-          <DialogDescription>
-            The details for the selected meal.
-          </DialogDescription>
-        </DialogHeader>
-
         <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{"Meal Details"}</DialogTitle>
+            <DialogDescription>
+              The details for the selected meal.
+            </DialogDescription>
+          </DialogHeader>
+
           {selectedMeal && (
             <MealFormComponent
               meal={selectedMeal}
@@ -183,7 +195,6 @@ export default function RecipeBox() {
         open={!!deleteMeal}
         onOpenChange={(open) => !open && setDeleteMeal(null)}
       >
-        <AlertDialogTrigger>Delete Meal</AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
