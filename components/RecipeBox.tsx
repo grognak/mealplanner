@@ -25,6 +25,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export default function RecipeBox() {
   const { data: session, status } = useSession();
@@ -35,6 +37,8 @@ export default function RecipeBox() {
 
   const [selectedMeal, setSelectedMeal] = useState<MealFormData | null>(null);
   const [deleteMeal, setDeleteMeal] = useState<MealFormData | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (status === "authenticated" && session?.user.id) {
@@ -72,6 +76,16 @@ export default function RecipeBox() {
   useEffect(() => {
     console.log("selectedMeal updated: ", selectedMeal);
   }, [selectedMeal]);
+
+  const filteredMeals = meals.filter((meal) => {
+    const term = searchQuery.toLowerCase();
+    const nameMatches = meal.name.toLowerCase().includes(term);
+    const tagMatches = meal.tags.some((tag) =>
+      tag.toLowerCase().includes(term),
+    );
+
+    return nameMatches || tagMatches;
+  });
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -146,18 +160,41 @@ export default function RecipeBox() {
     setIsCreating(true);
   };
 
+  const handleSearchChange = () => {
+    console.log("Search Query: ", searchQuery);
+  };
+
   return (
     <div className="recipe-box">
+      <div className="relative w-full max-w-full">
+        <Search
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          size={18}
+        />
+        <Input
+          className="pl-10"
+          type="text"
+          placeholder="Search"
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSearchChange();
+            }
+          }}
+          value={searchQuery}
+        />
+      </div>
+
       <div className="options-menu">
         <Button onClick={handleAddMeal}>Create Meal</Button>
       </div>
 
       <div className="recipe-grid">
-        {meals.length === 0 ? (
+        {filteredMeals.length === 0 ? (
           <div>No meals found.</div>
         ) : (
           <div className="meal-grid">
-            {meals.map((meal, idx) => (
+            {filteredMeals.map((meal, idx) => (
               <MealCardComponent
                 key={idx}
                 meal={meal}
