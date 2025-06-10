@@ -55,12 +55,15 @@ export default function RecipeBox() {
     }
   }, [status, session]);
 
+  useEffect(() => {
+    console.log("selectedMeal updated: ", selectedMeal);
+  }, [selectedMeal]);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   const handleMealSelect = (meal: MealFormData) => {
     setSelectedMeal(meal);
-    console.log(`Meal Selected:  ${JSON.stringify(meal)}`);
   };
 
   const handleFormSubmit = async (data: MealFormData) => {
