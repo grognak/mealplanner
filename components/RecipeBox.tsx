@@ -77,6 +77,16 @@ export default function RecipeBox() {
     console.log("selectedMeal updated: ", selectedMeal);
   }, [selectedMeal]);
 
+  const filteredMeals = meals.filter((meal) => {
+    const term = searchQuery.toLowerCase();
+    const nameMatches = meal.name.toLowerCase().includes(term);
+    const tagMatches = meal.tags.some((tag) =>
+      tag.toLowerCase().includes(term),
+    );
+
+    return nameMatches || tagMatches;
+  });
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -150,6 +160,10 @@ export default function RecipeBox() {
     setIsCreating(true);
   };
 
+  const handleSearchChange = () => {
+    console.log("Search Query: ", searchQuery);
+  };
+
   return (
     <div className="recipe-box">
       <div className="relative w-full max-w-full">
@@ -164,7 +178,7 @@ export default function RecipeBox() {
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              console.log("Search Query: ", searchQuery);
+              handleSearchChange();
             }
           }}
           value={searchQuery}
@@ -176,11 +190,11 @@ export default function RecipeBox() {
       </div>
 
       <div className="recipe-grid">
-        {meals.length === 0 ? (
+        {filteredMeals.length === 0 ? (
           <div>No meals found.</div>
         ) : (
           <div className="meal-grid">
-            {meals.map((meal, idx) => (
+            {filteredMeals.map((meal, idx) => (
               <MealCardComponent
                 key={idx}
                 meal={meal}
