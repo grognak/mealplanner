@@ -16,7 +16,7 @@ import {
 
 export default function RecipeBox() {
   const { data: session, status } = useSession();
-  const [meals, setMeals] = useState([]);
+  const [meals, setMeals] = useState<MealFormData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -67,9 +67,31 @@ export default function RecipeBox() {
   };
 
   const handleFormSubmit = async (data: MealFormData) => {
-    // update or create logic here
-    console.log("Submitting meal: ", data);
-    setSelectedMeal(null);
+    try {
+      const response = await fetch(`/api/meals/${data.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update meal");
+      }
+
+      const updatedMeal = await response.json();
+
+      setMeals((prevMeals) =>
+        prevMeals.map((meal) =>
+          meal.id === updatedMeal.id ? updatedMeal : meal,
+        ),
+      );
+
+      setSelectedMeal(null);
+    } catch (err) {
+      console.error("Error updating meal:", err);
+    }
   };
 
   return (
