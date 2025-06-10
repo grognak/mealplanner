@@ -1,29 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Meal } from "@/types/custom";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface MealCardProps {
-  slug: Meal;
+  meal: Meal;
+  onClick: () => void;
 }
 
-export default function MealCardComponent({ slug }: MealCardProps) {
-  const [meal, setMeal] = useState(slug);
-
-  useEffect(() => {
-    setMeal(meal);
-  }, []);
-
+export default function MealCardComponent({ meal, onClick }: MealCardProps) {
   return (
-    <div>
+    <div onClick={onClick}>
       <Card>
         <CardHeader>
           <CardTitle>{meal.name}</CardTitle>
         </CardHeader>
         <CardFooter>
-          {meal.tags.map((tag) => (
-            <span className="text-sm font-light" key={tag.id}>
+          {meal.tags.map((tag, idx) => (
+            <span className="text-sm font-light" key={idx}>
               #{tag}{" "}
             </span>
           ))}

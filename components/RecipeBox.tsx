@@ -3,12 +3,24 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import MealCardComponent from "@/components/MealCard";
+import { MealFormData } from "@/lib/validators/mealSchema";
+import MealFormComponent from "@/components/MealForm";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogHeader,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 export default function RecipeBox() {
   const { data: session, status } = useSession();
-  const [meals, setMeals] = useState([]);
+  const [meals, setMeals] = useState<MealFormData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
+
+  const [selectedMeal, setSelectedMeal] = useState<MealFormData | null>(null);
 
   useEffect(() => {
     if (status === "authenticated" && session?.user.id) {
@@ -43,8 +55,44 @@ export default function RecipeBox() {
     }
   }, [status, session]);
 
+  useEffect(() => {
+    console.log("selectedMeal updated: ", selectedMeal);
+  }, [selectedMeal]);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
+
+  const handleMealSelect = (meal: MealFormData) => {
+    setSelectedMeal(meal);
+  };
+
+  const handleFormSubmit = async (data: MealFormData) => {
+    try {
+      const response = await fetch(`/api/meals/${data.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update meal");
+      }
+
+      const updatedMeal = await response.json();
+
+      setMeals((prevMeals) =>
+        prevMeals.map((meal) =>
+          meal.id === updatedMeal.id ? updatedMeal : meal,
+        ),
+      );
+
+      setSelectedMeal(null);
+    } catch (err) {
+      console.error("Error updating meal:", err);
+    }
+  };
 
   return (
     <div className="recipe-box">
@@ -52,11 +100,36 @@ export default function RecipeBox() {
         <div>No meals found.</div>
       ) : (
         <div className="meal-grid">
-          {meals.map((meal) => (
-            <MealCardComponent key={meal.id} slug={meal} />
+          {meals.map((meal, idx) => (
+            <MealCardComponent
+              key={idx}
+              meal={meal}
+              onClick={() => handleMealSelect(meal)}
+            />
           ))}
         </div>
       )}
+
+      <Dialog
+        open={!!selectedMeal}
+        onOpenChange={(open) => !open && setSelectedMeal(null)}
+      >
+        <DialogHeader>
+          <DialogTitle>{"Meal Details"}</DialogTitle>
+          <DialogDescription>
+            The details for the selected meal.
+          </DialogDescription>
+        </DialogHeader>
+
+        <DialogContent>
+          {selectedMeal && (
+            <MealFormComponent
+              meal={selectedMeal}
+              onSubmit={handleFormSubmit}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
