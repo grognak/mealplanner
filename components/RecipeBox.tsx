@@ -15,6 +15,18 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 export default function RecipeBox() {
   const { data: session, status } = useSession();
   const [meals, setMeals] = useState<MealFormData[]>([]);
@@ -23,7 +35,6 @@ export default function RecipeBox() {
   const [isCreating, setIsCreating] = useState(false);
 
   const [selectedMeal, setSelectedMeal] = useState<MealFormData | null>(null);
-  // eslint-disable-next-line
   const [deleteMeal, setDeleteMeal] = useState<MealFormData | null>(null);
 
   useEffect(() => {
@@ -70,10 +81,8 @@ export default function RecipeBox() {
     setSelectedMeal(meal);
   };
 
-  const handleDelete = (meal: MealFormData) => {
-    setDeleteMeal(meal);
-
-    console.log("Delete Meal Button clicked: ", JSON.stringify(meal));
+  const handleDelete = () => {
+    console.log("Delete Meal Button clicked: ", JSON.stringify(deleteMeal));
 
     setDeleteMeal(null);
   };
@@ -141,7 +150,7 @@ export default function RecipeBox() {
                 key={idx}
                 meal={meal}
                 onClick={() => handleMealSelect(meal)}
-                onDelete={() => handleDelete(meal)}
+                onDelete={() => setDeleteMeal(meal)}
               />
             ))}
           </div>
@@ -168,6 +177,32 @@ export default function RecipeBox() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={!!deleteMeal}
+        onOpenChange={(open) => !open && setDeleteMeal(null)}
+      >
+        <AlertDialogTrigger>Delete Meal</AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              meal.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
