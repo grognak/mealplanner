@@ -13,12 +13,14 @@ import {
   DialogHeader,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { Button } from "./ui/button";
 
 export default function RecipeBox() {
   const { data: session, status } = useSession();
   const [meals, setMeals] = useState<MealFormData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
 
   const [selectedMeal, setSelectedMeal] = useState<MealFormData | null>(null);
 
@@ -68,47 +70,72 @@ export default function RecipeBox() {
 
   const handleFormSubmit = async (data: MealFormData) => {
     try {
-      const response = await fetch(`/api/meals/${data.id}`, {
-        method: "PATCH",
+      const method = isCreating ? "POST" : "PATCH";
+      const url = isCreating ? "/api/meals" : `/api/meals/${data.id}`;
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.user.id}`,
         },
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update meal");
-      }
+      if (!response.ok) throw new Error("Failed to save meal");
 
       const updatedMeal = await response.json();
 
-      setMeals((prevMeals) =>
-        prevMeals.map((meal) =>
-          meal.id === updatedMeal.id ? updatedMeal : meal,
-        ),
-      );
-
-      setSelectedMeal(null);
+      setMeals((prev) => {
+        if (isCreating) {
+          return [...prev, updatedMeal];
+        } else {
+          return prev.map((m) => (m.id === updatedMeal.id ? updatedMeal : m));
+        }
+      });
     } catch (err) {
-      console.error("Error updating meal:", err);
+      console.error("Save error:", err);
+    } finally {
+      setSelectedMeal(null);
+      setIsCreating(false);
     }
+  };
+
+  const handleAddMeal = () => {
+    setSelectedMeal({
+      id: "",
+      name: "",
+      tags: [],
+      lastMade: undefined,
+      notes: [],
+      img_file: "",
+      recipe_link: "",
+      userId: session?.user.id,
+    });
+    setIsCreating(true);
   };
 
   return (
     <div className="recipe-box">
-      {meals.length === 0 ? (
-        <div>No meals found.</div>
-      ) : (
-        <div className="meal-grid">
-          {meals.map((meal, idx) => (
-            <MealCardComponent
-              key={idx}
-              meal={meal}
-              onClick={() => handleMealSelect(meal)}
-            />
-          ))}
-        </div>
-      )}
+      <div className="options-menu">
+        <Button onClick={handleAddMeal}>Create Meal</Button>
+      </div>
+
+      <div className="recipe-grid">
+        {meals.length === 0 ? (
+          <div>No meals found.</div>
+        ) : (
+          <div className="meal-grid">
+            {meals.map((meal, idx) => (
+              <MealCardComponent
+                key={idx}
+                meal={meal}
+                onClick={() => handleMealSelect(meal)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       <Dialog
         open={!!selectedMeal}

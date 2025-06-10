@@ -25,3 +25,27 @@ export async function GET(req: Request) {
     });
   }
 }
+
+export async function POST(req: Request) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token?.id) {
+    return new Response(JSON.stringify({ message: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+
+  const body = await req.json();
+  const newMeal = await prisma.meal.create({
+    data: {
+      name: body.name,
+      tags: body.tags,
+      lastMade: body.lastMade,
+      notes: body.notes,
+      img_file: body.img_file,
+      recipe_link: body.recipe_link,
+      userId: token.id,
+    },
+  });
+
+  return new Response(JSON.stringify(newMeal), { status: 201 });
+}
