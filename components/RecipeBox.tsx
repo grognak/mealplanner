@@ -63,6 +63,12 @@ export default function RecipeBox() {
     console.log(`Meal Selected:  ${JSON.stringify(meal)}`);
   };
 
+  const handleFormSubmit = async (data: MealFormData) => {
+    // update or create logic here
+    console.log("Submitting meal: ", data);
+    setSelectedMeal(null);
+  };
+
   return (
     <div className="recipe-box">
       {meals.length === 0 ? (
@@ -90,7 +96,14 @@ export default function RecipeBox() {
           </DialogDescription>
         </DialogHeader>
 
-        <DialogContent>{selectedMeal && <MealFormComponent />}</DialogContent>
+        <DialogContent>
+          {selectedMeal && (
+            <MealFormComponent
+              meal={selectedMeal}
+              onSubmit={handleFormSubmit}
+            />
+          )}
+        </DialogContent>
       </Dialog>
     </div>
   );

@@ -1,9 +1,9 @@
 export type Meal = {
-  id: string;
+  id?: string;
   name: string;
-  tags: string[];
+  tags?: string[] | undefined;
   lastMade?: Date;
-  notes: string[];
+  notes?: string[] | undefined;
   img_file?: string;
   recipe_link?: string;
 };
