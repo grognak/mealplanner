@@ -3,12 +3,16 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import MealCardComponent from "@/components/MealCard";
+import { MealFormData } from "@/lib/validators/mealSchema";
 
 export default function RecipeBox() {
   const { data: session, status } = useSession();
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // eslint-disable-next-line
+  const [selectedMeal, setSelectedMeal] = useState<MealFormData | null>(null);
 
   useEffect(() => {
     if (status === "authenticated" && session?.user.id) {
@@ -46,6 +50,11 @@ export default function RecipeBox() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
+  const handleMealSelect = (meal: MealFormData) => {
+    setSelectedMeal(meal);
+    console.log(`Meal Selected:  ${JSON.stringify(meal)}`);
+  };
+
   return (
     <div className="recipe-box">
       {meals.length === 0 ? (
@@ -53,7 +62,11 @@ export default function RecipeBox() {
       ) : (
         <div className="meal-grid">
           {meals.map((meal, idx) => (
-            <MealCardComponent key={idx} slug={meal} />
+            <MealCardComponent
+              key={idx}
+              meal={meal}
+              onClick={() => handleMealSelect(meal)}
+            />
           ))}
         </div>
       )}
