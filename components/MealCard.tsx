@@ -11,7 +11,11 @@ interface MealCardProps {
   onDelete: () => void;
 }
 
-export default function MealCardComponent({ meal, onClick }: MealCardProps) {
+export default function MealCardComponent({
+  meal,
+  onClick,
+  onDelete,
+}: MealCardProps) {
   return (
     <div onClick={onClick}>
       <Card>
@@ -23,11 +27,8 @@ export default function MealCardComponent({ meal, onClick }: MealCardProps) {
               size="icon"
               className="top-2 right-2 z-10"
               onClick={(e) => {
-                console.log(
-                  "Delete Meal Button clicked: ",
-                  JSON.stringify(meal),
-                );
                 e.stopPropagation(); // prevent the meal form from opening
+                onDelete();
               }}
             >
               <Trash2 size={16} className="text-red-500 hover:text-red-700" />

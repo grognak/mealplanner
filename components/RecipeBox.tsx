@@ -23,6 +23,8 @@ export default function RecipeBox() {
   const [isCreating, setIsCreating] = useState(false);
 
   const [selectedMeal, setSelectedMeal] = useState<MealFormData | null>(null);
+  // eslint-disable-next-line
+  const [deleteMeal, setDeleteMeal] = useState<MealFormData | null>(null);
 
   useEffect(() => {
     if (status === "authenticated" && session?.user.id) {
@@ -66,6 +68,14 @@ export default function RecipeBox() {
 
   const handleMealSelect = (meal: MealFormData) => {
     setSelectedMeal(meal);
+  };
+
+  const handleDelete = (meal: MealFormData) => {
+    setDeleteMeal(meal);
+
+    console.log("Delete Meal Button clicked: ", JSON.stringify(meal));
+
+    setDeleteMeal(null);
   };
 
   const handleFormSubmit = async (data: MealFormData) => {
@@ -131,6 +141,7 @@ export default function RecipeBox() {
                 key={idx}
                 meal={meal}
                 onClick={() => handleMealSelect(meal)}
+                onDelete={() => handleDelete(meal)}
               />
             ))}
           </div>
