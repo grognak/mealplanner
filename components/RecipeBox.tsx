@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import MealCardComponent from "@/components/MealCard";
 import { MealFormData } from "@/lib/validators/mealSchema";
+import MealFormComponent from "@/components/MealForm";
 
 import {
   Dialog,
@@ -89,9 +90,7 @@ export default function RecipeBox() {
           </DialogDescription>
         </DialogHeader>
 
-        <DialogContent>
-          {selectedMeal && <p>I have selected a meal!</p>}
-        </DialogContent>
+        <DialogContent>{selectedMeal && <MealFormComponent />}</DialogContent>
       </Dialog>
     </div>
   );
