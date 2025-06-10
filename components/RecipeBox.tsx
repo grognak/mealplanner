@@ -5,13 +5,20 @@ import { useSession } from "next-auth/react";
 import MealCardComponent from "@/components/MealCard";
 import { MealFormData } from "@/lib/validators/mealSchema";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogHeader,
+  DialogDescription,
+} from "@/components/ui/dialog";
+
 export default function RecipeBox() {
   const { data: session, status } = useSession();
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // eslint-disable-next-line
   const [selectedMeal, setSelectedMeal] = useState<MealFormData | null>(null);
 
   useEffect(() => {
@@ -70,6 +77,22 @@ export default function RecipeBox() {
           ))}
         </div>
       )}
+
+      <Dialog
+        open={!!selectedMeal}
+        onOpenChange={(open) => !open && setSelectedMeal(null)}
+      >
+        <DialogHeader>
+          <DialogTitle>{"Meal Details"}</DialogTitle>
+          <DialogDescription>
+            The details for the selected meal.
+          </DialogDescription>
+        </DialogHeader>
+
+        <DialogContent>
+          {selectedMeal && <p>I have selected a meal!</p>}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
