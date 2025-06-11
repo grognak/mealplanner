@@ -211,16 +211,37 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
         <FormField
           control={form.control}
           name="img_file"
-          render={({ field }) => (
+          render={({}) => (
             <FormItem>
               <FormLabel>Image File</FormLabel>
               <FormControl>
-                {/** When we implement this change it to a image picker **/}
                 <Input
-                  placeholder="Image Picker coming soon"
-                  {...field}
-                  value={field.value || ""}
-                  readOnly
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        form.setValue("img_file", reader.result as string, {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                        });
+                      };
+                      reader.readAsDataURL(file);
+                    } else {
+                      form.setValue("img_file", "", {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                    }
+                  }}
+                  className="h-14 block w-full text-sm text-gray-500
+                             file:mr-4 file:py-2 file:px-4 file:py-3
+                             file:rounded file:border-0
+                             file:text-sm file:font-semibold
+                             file:bg-blue-50 file:text-blue-700
+                             hover:file:bg-blue-100"
                 />
               </FormControl>
               <FormMessage />
