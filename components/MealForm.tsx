@@ -208,42 +208,6 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
           )}
         />
 
-        {/** Image Preview **/}
-        <div className="relative inline-block w-full max-w-sm rounded overflow-hidden border">
-          {form.watch("img_file") && (
-            <div className="img-preview">
-              <img
-                src={form.watch("img_file")}
-                alt="Meal preview"
-                className="mt-2 rounded-md w-full h-auto max-h-60 object-cover"
-              />
-              <Button
-                variant="ghost"
-                type="button"
-                size="icon"
-                className="top-2 right-2 z-10"
-                onClick={() => {
-                  form.setValue("img_file", "", {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  });
-                  if (fileInputRef.current) {
-                    fileInputRef.current.value = ""; // Reset file name
-                  }
-                }}
-              >
-                <p
-                  className="text-red-500 hover:text-red-700 absolute top-2 right-2 bg-black
-                  bg-opacity-60rounded-full p-1 hover:bg-opacity-80"
-                  aria-label="Remove image"
-                >
-                  x
-                </p>
-              </Button>
-            </div>
-          )}
-        </div>
-
         {/** Image File **/}
         <FormField
           control={form.control}
@@ -251,6 +215,42 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
           render={({}) => (
             <FormItem>
               <FormLabel>Image File</FormLabel>
+              {/** Image Preview **/}
+              <div className="relative inline-block w-full max-w-sm rounded overflow-hidden border">
+                {form.watch("img_file") && (
+                  <div className="img-preview">
+                    <img
+                      src={form.watch("img_file")}
+                      alt="Meal preview"
+                      className="mt-2 rounded-md w-full h-auto max-h-60 object-cover"
+                    />
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      size="icon"
+                      className="top-2 right-2 z-10"
+                      onClick={() => {
+                        form.setValue("img_file", "", {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                        });
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = ""; // Reset file name
+                        }
+                      }}
+                    >
+                      <p
+                        className="text-red-500 hover:text-red-700 absolute top-2 right-2 bg-black
+                        bg-opacity-60rounded-full p-1 hover:bg-opacity-80"
+                        aria-label="Remove image"
+                      >
+                        x
+                      </p>
+                    </Button>
+                  </div>
+                )}
+              </div>
+
               <FormControl>
                 <Input
                   type="file"
