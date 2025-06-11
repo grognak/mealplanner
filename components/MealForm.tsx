@@ -207,6 +207,15 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
           )}
         />
 
+        {/** Image Preview **/}
+        {form.watch("img_file") && (
+          <img
+            src={form.watch("img_file")}
+            alt="Meal preview"
+            className="mt-2 rounded-md w-full h-auto max-h-60 object-cover"
+          />
+        )}
+
         {/** Image File **/}
         <FormField
           control={form.control}
