@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -45,6 +45,7 @@ type DatabaseMeal = Meal & {
 export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
   const partialMealFormSchema = mealFormSchema.partial();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const getFormDefaults = (meal: DatabaseMeal | null | undefined) => {
     if (!meal) {
@@ -81,8 +82,14 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
     form.reset(meal);
   }, [meal]);
 
-  const onValidSubmit = (data: MealFormData) => {
+  const onValidSubmit = async (data: MealFormData) => {
     console.log(`Meal Selected:  ${JSON.stringify(data)}`);
+
+    if (selectedFile) {
+      const imageUrl = "John Dee"; //await uploadToCloudinary(selectedFile);
+      data.img_file = imageUrl; // Attach Cloudinary image URL to your form data
+    }
+
     onSubmit(data);
   };
 
@@ -234,6 +241,7 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                           shouldValidate: true,
                           shouldDirty: true,
                         });
+                        setSelectedFile(null);
                         if (fileInputRef.current) {
                           fileInputRef.current.value = ""; // Reset file name
                         }
@@ -259,14 +267,12 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        form.setValue("img_file", reader.result as string, {
-                          shouldValidate: true,
-                          shouldDirty: true,
-                        });
-                      };
-                      reader.readAsDataURL(file);
+                      setSelectedFile(file);
+                      const previewUrl = URL.createObjectURL(file);
+                      form.setValue("img_file", previewUrl, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
                     } else {
                       form.setValue("img_file", "", {
                         shouldValidate: true,

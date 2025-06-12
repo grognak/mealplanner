@@ -1,40 +1,36 @@
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
+import { NextRequest } from "next/server";
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } },
+  req: NextRequest,
+  context: { params: { id: string } },
 ) {
-  try {
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const { id } = await context.params;
 
-    if (!token?.id) {
-      return new Response(JSON.stringify({ message: "Unauthorized" }), {
-        status: 401,
-      });
-    }
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-    const body = await req.json();
-
-    const updatedMeal = await prisma.meal.update({
-      where: {
-        id: params.id,
-        userId: token.id, // ensures user owns the meal
-      },
-      data: body,
-    });
-
-    return new Response(JSON.stringify(updatedMeal), { status: 200 });
-  } catch (error) {
-    console.error("Error updating meal:", error);
-    return new Response(JSON.stringify({ message: "Server error" }), {
-      status: 500,
+  if (!token?.id) {
+    return new Response(JSON.stringify({ message: "Unauthorized" }), {
+      status: 401,
     });
   }
+
+  const body = await req.json();
+
+  const updatedMeal = await prisma.meal.update({
+    where: {
+      id,
+      userId: token.id,
+    },
+    data: body,
+  });
+
+  return new Response(JSON.stringify(updatedMeal), { status: 200 });
 }
 
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } },
 ) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });

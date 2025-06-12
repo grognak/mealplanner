@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import MealFormComponent from "@/components/MealForm";
 import { vi } from "vitest";
 
@@ -18,9 +19,10 @@ test("submits valid form", async () => {
   render(<MealFormComponent meal={mockMeal} onSubmit={onSubmit} />);
 
   const nameInput = screen.getByLabelText(/meal name/i);
-  fireEvent.change(nameInput, { target: { value: "Pizza" } });
+  await userEvent.type(nameInput, "Pizza");
 
-  fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+  const submitButton = await screen.findByRole("button", { name: /submit/i });
+  await userEvent.click(submitButton);
 
   await screen.findByDisplayValue("Pizza");
 
