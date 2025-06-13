@@ -36,7 +36,7 @@ export default function MealCardComponent({
           </CardTitle>
         </CardHeader>
         <CardFooter>
-          {meal.tags.map((tag, idx) => (
+          {meal.tags?.map((tag, idx) => (
             <span className="text-sm font-light" key={idx}>
               #{tag}{" "}
             </span>
