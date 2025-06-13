@@ -48,6 +48,10 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const buildCloudinaryUrl = (publicId: string) =>
+    `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,q_auto,f_auto,w_600,h_300/${publicId}`;
+
   const getFormDefaults = (meal: DatabaseMeal | null | undefined) => {
     if (!meal) {
       return {
@@ -238,18 +242,22 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
             <FormItem>
               <FormLabel>Image File</FormLabel>
               <div className="relative inline-block w-full max-w-sm rounded overflow-hidden border">
-                {form.watch("img_file") && (
-                  <div className="img-preview">
+                {(form.watch("img_file") || meal.img_public_id) && (
+                  <div className="relative w-full max-w-md rounded overflow-hidden border">
                     <img
-                      src={form.watch("img_file")}
+                      src={
+                        form.watch("img_file") ||
+                        buildCloudinaryUrl(meal.img_public_id as string)
+                      }
                       alt="Meal preview"
-                      className="mt-2 rounded-md w-full h-auto max-h-60 object-cover"
+                      className="w-full h-48 object-cover"
                     />
                     <Button
                       variant="ghost"
                       type="button"
                       size="icon"
                       className="top-2 right-2 z-10"
+                      aria-label="Remove image"
                       disabled={uploading}
                       onClick={() => {
                         form.setValue("img_file", "", {
