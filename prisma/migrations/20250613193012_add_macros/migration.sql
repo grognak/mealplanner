@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Meal" ADD COLUMN     "calories" INTEGER,
+ADD COLUMN     "carbs" DOUBLE PRECISION,
+ADD COLUMN     "fat" DOUBLE PRECISION,
+ADD COLUMN     "protein" DOUBLE PRECISION;
