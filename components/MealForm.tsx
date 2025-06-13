@@ -26,13 +26,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import imageCompression from "browser-image-compression";
 
 type MealFormProps = {
   meal: Meal;
   onSubmit: (data: MealFormData) => void;
 };
 
-// Type for meal data from database that might have null values
 type DatabaseMeal = Meal & {
   img_file?: string | null;
   recipe_link?: string | null;
@@ -46,6 +46,7 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
   const partialMealFormSchema = mealFormSchema.partial();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const getFormDefaults = (meal: DatabaseMeal | null | undefined) => {
     if (!meal) {
@@ -83,27 +84,45 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
   }, [meal]);
 
   const onValidSubmit = async (data: MealFormData) => {
-    console.log(`Meal Selected:  ${JSON.stringify(data)}`);
+    let imageUrl: string | undefined;
+    let publicId: string | undefined;
 
-    if (selectedFile) {
-      const imageUrl = "John Dee"; //await uploadToCloudinary(selectedFile);
-      data.img_file = imageUrl; // Attach Cloudinary image URL to your form data
+    try {
+      if (selectedFile) {
+        setUploading(true);
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        const res = await fetch("/api/images/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) throw new Error("Upload failed");
+
+        const cloudinaryResult = await res.json();
+        imageUrl = cloudinaryResult.secure_url;
+        publicId = cloudinaryResult.public_id;
+      }
+
+      const mealPayload = {
+        ...data,
+        img_url: imageUrl,
+        img_public_id: publicId,
+      };
+
+      onSubmit(mealPayload);
+    } catch (err) {
+      console.error("Upload failed", err);
+    } finally {
+      setUploading(false);
     }
-
-    onSubmit(data);
   };
-
-  console.log("👀 MealFormComponent mounted with meal:", meal);
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onValidSubmit, (errors) => {
-          console.log("Form validation errors", errors);
-        })}
-        className="space-y-8"
-      >
-        {/** Name **/}
+      <form onSubmit={form.handleSubmit(onValidSubmit)} className="space-y-8">
         <FormField
           control={form.control}
           name="name"
@@ -118,7 +137,6 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
           )}
         />
 
-        {/** Tags **/}
         <FormField
           control={form.control}
           name="tags"
@@ -132,9 +150,8 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                     Array.isArray(field.value) ? field.value.join(", ") : ""
                   }
                   onChange={(e) => {
-                    const value = e.target.value;
-                    const tagsArray = value
-                      ? value.split(",").map((tag) => tag.trim())
+                    const tagsArray = e.target.value
+                      ? e.target.value.split(",").map((tag) => tag.trim())
                       : [];
                     field.onChange(tagsArray);
                   }}
@@ -145,7 +162,6 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
           )}
         />
 
-        {/** Last Made **/}
         <FormField
           control={form.control}
           name="lastMade"
@@ -156,8 +172,8 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      variant={"outline"}
-                      className={"w-[240px] pl-3 text-left font-normal"}
+                      variant="outline"
+                      className="w-[240px] pl-3 text-left font-normal"
                     >
                       {field.value ? (
                         format(field.value, "PPP")
@@ -188,7 +204,6 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
           )}
         />
 
-        {/** Notes **/}
         <FormField
           control={form.control}
           name="notes"
@@ -202,9 +217,8 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                     Array.isArray(field.value) ? field.value.join("\n") : ""
                   }
                   onChange={(e) => {
-                    const value = e.target.value;
-                    const notesArray = value
-                      ? value.split("\n").filter((note) => note.trim())
+                    const notesArray = e.target.value
+                      ? e.target.value.split("\n").filter((note) => note.trim())
                       : [];
                     field.onChange(notesArray);
                   }}
@@ -215,14 +229,14 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
           )}
         />
 
-        {/** Image File **/}
+        {uploading && <p className="text-blue-600">Uploading image...</p>}
+
         <FormField
           control={form.control}
           name="img_file"
-          render={({}) => (
+          render={() => (
             <FormItem>
               <FormLabel>Image File</FormLabel>
-              {/** Image Preview **/}
               <div className="relative inline-block w-full max-w-sm rounded overflow-hidden border">
                 {form.watch("img_file") && (
                   <div className="img-preview">
@@ -236,6 +250,7 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                       type="button"
                       size="icon"
                       className="top-2 right-2 z-10"
+                      disabled={uploading}
                       onClick={() => {
                         form.setValue("img_file", "", {
                           shouldValidate: true,
@@ -243,13 +258,12 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                         });
                         setSelectedFile(null);
                         if (fileInputRef.current) {
-                          fileInputRef.current.value = ""; // Reset file name
+                          fileInputRef.current.value = "";
                         }
                       }}
                     >
                       <p
-                        className="text-red-500 hover:text-red-700 absolute top-2 right-2 bg-black
-                        bg-opacity-60rounded-full p-1 hover:bg-opacity-80"
+                        className="text-red-500 hover:text-red-700 absolute top-2 right-2 bg-black bg-opacity-60 rounded-full p-1 hover:bg-opacity-80"
                         aria-label="Remove image"
                       >
                         x
@@ -264,15 +278,29 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                   type="file"
                   accept="image/*"
                   ref={fileInputRef}
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      setSelectedFile(file);
-                      const previewUrl = URL.createObjectURL(file);
-                      form.setValue("img_file", previewUrl, {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      });
+                      try {
+                        const compressedFile = await imageCompression(file, {
+                          maxSizeMB: 1,
+                          maxWidthOrHeight: 1024,
+                          useWebWorker: true,
+                        });
+
+                        setSelectedFile(compressedFile);
+
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          form.setValue("img_file", reader.result as string, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          });
+                        };
+                        reader.readAsDataURL(compressedFile);
+                      } catch (err) {
+                        console.error("Image compression failed", err);
+                      }
                     } else {
                       form.setValue("img_file", "", {
                         shouldValidate: true,
@@ -280,12 +308,7 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                       });
                     }
                   }}
-                  className="h-14 block w-full text-sm text-gray-500
-                             file:mr-4 file:py-2 file:px-4 file:py-3
-                             file:rounded file:border-0
-                             file:text-sm file:font-semibold
-                             file:bg-blue-50 file:text-blue-700
-                             hover:file:bg-blue-100"
+                  className="h-14 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
               </FormControl>
               <FormMessage />
@@ -293,7 +316,6 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
           )}
         />
 
-        {/** Recipe Link **/}
         <FormField
           control={form.control}
           name="recipe_link"
