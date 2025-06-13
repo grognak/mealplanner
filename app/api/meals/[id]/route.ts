@@ -76,31 +76,38 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
-  if (!token?.id) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  const { id } = await params;
 
   try {
-    const meal = await prisma.meal.findFirst({
-      where: {
-        id: params.id,
-        userId: token.id,
-      },
+    const existingMeal = await prisma.meal.findUnique({
+      where: { id },
+      select: { img_public_id: true },
     });
 
-    if (!meal) {
-      return new Response("Meal not found", { status: 404 });
+    if (!existingMeal) {
+      return NextResponse.json({ error: "Meal not found" }, { status: 404 });
     }
 
-    await prisma.meal.delete({
-      where: { id: params.id },
-    });
+    if (existingMeal.img_public_id) {
+      try {
+        await cloudinary.uploader.destroy(existingMeal.img_public_id);
+      } catch (err) {
+        console.error("Faied to delete image from Cloudinary", err);
+        // Not fatal - proceed with deleting the meal anyway
+      }
+    }
 
-    return new Response("Meal deleted", { status: 200 });
+    await prisma.meal.delete({ where: { id } });
+
+    return NextResponse.json(
+      { message: "Meal deleted successfully" },
+      { status: 200 },
+    );
   } catch (err) {
-    console.error(err);
-    return new Response("Server error", { status: 500 });
+    console.error("Failed to delete meal", err);
+    return NextResponse.json(
+      { message: "Failed to delete meal" },
+      { status: 500 },
+    );
   }
 }
