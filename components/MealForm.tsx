@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/popover";
 import imageCompression from "browser-image-compression";
 
+import { Loader2 } from "lucide-react"; // lucide spinner
+
 type MealFormProps = {
   meal: Meal;
   onSubmit: (data: MealFormData) => void;
@@ -277,6 +279,12 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                         x
                       </p>
                     </Button>
+
+                    {uploading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                        <Loader2 className="h-8 w-8 animate-spin text-white" />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
