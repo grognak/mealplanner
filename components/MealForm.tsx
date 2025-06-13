@@ -350,7 +350,9 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
           )}
         />
 
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={uploading}>
+          {uploading ? "Uploading…" : "Submit"}
+        </Button>
       </form>
     </Form>
   );
