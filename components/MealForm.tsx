@@ -28,7 +28,9 @@ import {
 } from "@/components/ui/popover";
 import imageCompression from "browser-image-compression";
 
-import { Loader2 } from "lucide-react"; // lucide spinner
+import { Loader2 } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { XOctagon } from "lucide-react";
 
 type MealFormProps = {
   meal: Meal;
@@ -49,6 +51,7 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const buildCloudinaryUrl = (publicId: string) =>
@@ -121,6 +124,7 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
       onSubmit(mealPayload);
     } catch (err) {
       console.error("Upload failed", err);
+      setUploadError(err.message ?? "Unexpected image upload error");
     } finally {
       setUploading(false);
     }
@@ -296,6 +300,7 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                   ref={fileInputRef}
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
+                    setUploadError(null);
                     if (file) {
                       try {
                         const compressedFile = await imageCompression(file, {
@@ -349,6 +354,16 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
             </FormItem>
           )}
         />
+
+        {uploadError && (
+          <Alert variant="destructive" className="flex gap-2">
+            <XOctagon className="h-5 w-5" />
+            <div>
+              <AlertTitle className="font-semibold">Upload error</AlertTitle>
+              <AlertDescription>{uploadError}</AlertDescription>
+            </div>
+          </Alert>
+        )}
 
         <Button type="submit" disabled={uploading}>
           {uploading ? "Uploading…" : "Submit"}
