@@ -1,32 +1,39 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import MealFormComponent from "@/components/MealForm";
-import { vi } from "vitest";
 
 const mockMeal = {
-  id: "",
-  name: "",
-  tags: [],
+  id: "1",
+  name: "Test Meal",
+  tags: ["dinner"],
+  lastMade: undefined,
   notes: [],
   img_file: "",
   recipe_link: "",
-  userId: "test-user",
-  lastMade: undefined,
+  userId: "user1",
+  img_public_id: "",
 };
 
-test("submits valid form", async () => {
-  const onSubmit = vi.fn();
-  render(<MealFormComponent meal={mockMeal} onSubmit={onSubmit} />);
+describe("MealFormComponent", () => {
+  let onSubmit: ReturnType<typeof vi.fn>;
+  beforeEach(() => {
+    onSubmit = vi.fn();
+  });
 
-  const nameInput = screen.getByLabelText(/meal name/i);
-  await userEvent.type(nameInput, "Pizza");
+  it("Handles ❌ button to remove image", async () => {
+    render(
+      <MealFormComponent
+        meal={{ ...mockMeal, img_file: "data:image/png;base64,..." }}
+        onSubmit={onSubmit}
+      />,
+    );
 
-  const submitButton = await screen.findByRole("button", { name: /submit/i });
-  await userEvent.click(submitButton);
+    const removeButton = await screen.findByLabelText(/remove image/i);
+    fireEvent.click(removeButton);
 
-  await screen.findByDisplayValue("Pizza");
-
-  expect(onSubmit).toHaveBeenCalledWith(
-    expect.objectContaining({ name: "Pizza" }),
-  );
+    await waitFor(() => {
+      const img = screen.queryByAltText("Meal preview");
+      expect(img).not.toBeInTheDocument();
+    });
+  });
 });

@@ -93,6 +93,11 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
   }, [meal]);
 
   const onValidSubmit = async (data: MealFormData) => {
+    if (uploadError) {
+      console.warn("Form blocked – invalid image file");
+      return;
+    }
+
     let imageUrl: string | undefined;
     let publicId: string | undefined;
 
@@ -276,10 +281,7 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                         }
                       }}
                     >
-                      <p
-                        className="text-red-500 hover:text-red-700 absolute top-2 right-2 bg-black bg-opacity-60 rounded-full p-1 hover:bg-opacity-80"
-                        aria-label="Remove image"
-                      >
+                      <p className="text-red-500 hover:text-red-700 absolute top-2 right-2 bg-black bg-opacity-60 rounded-full p-1 hover:bg-opacity-80">
                         x
                       </p>
                     </Button>
@@ -301,7 +303,20 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
                     setUploadError(null);
+
                     if (file) {
+                      if (!file.type.startsWith("image/")) {
+                        setUploadError("Only image files are allowed.");
+                        form.setValue("img_file", "", {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                        });
+                        setSelectedFile(null);
+                        if (fileInputRef.current)
+                          fileInputRef.current.value = "";
+                        return;
+                      }
+
                       try {
                         const compressedFile = await imageCompression(file, {
                           maxSizeMB: 1,
@@ -321,12 +336,16 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
                         reader.readAsDataURL(compressedFile);
                       } catch (err) {
                         console.error("Image compression failed", err);
+                        setUploadError(
+                          "Image compression failed. Please try another file.",
+                        );
                       }
                     } else {
                       form.setValue("img_file", "", {
                         shouldValidate: true,
                         shouldDirty: true,
                       });
+                      setSelectedFile(null);
                     }
                   }}
                   className="h-14 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
@@ -365,7 +384,7 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
           </Alert>
         )}
 
-        <Button type="submit" disabled={uploading}>
+        <Button type="submit" disabled={uploading || !!uploadError}>
           {uploading ? "Uploading…" : "Submit"}
         </Button>
       </form>
