@@ -210,7 +210,7 @@ export default function RecipeBox() {
         open={!!selectedMeal}
         onOpenChange={(open) => !open && setSelectedMeal(null)}
       >
-        <DialogContent>
+        <DialogContent className={"overflow-y-scroll max-h-screen"}>
           <DialogHeader>
             <DialogTitle>{"Meal Details"}</DialogTitle>
             <DialogDescription>

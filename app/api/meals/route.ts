@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { getToken } from "next-auth/jwt";
+import { NextRequest } from "next/server";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     console.log("Token on server: ", token);
@@ -13,7 +14,7 @@ export async function GET(req: Request) {
 
     const meals = await prisma.meal.findMany({
       where: {
-        userId: token.id,
+        userId: String(token.id),
       },
     });
 
@@ -26,7 +27,7 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   if (!token?.id) {
     return new Response(JSON.stringify({ message: "Unauthorized" }), {
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
       notes: body.notes,
       img_file: body.img_file,
       recipe_link: body.recipe_link,
-      userId: token.id,
+      userId: String(token.id),
     },
   });
 
