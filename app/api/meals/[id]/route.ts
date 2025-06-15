@@ -41,16 +41,31 @@ export async function PATCH(req: NextRequest, context: Context) {
       }
     }
 
-    const { name, tags, notes, img_url, img_public_id, recipe_link, lastMade } =
-      body as {
-        name?: string;
-        tags?: string[];
-        notes?: string[];
-        img_url?: string;
-        img_public_id?: string;
-        recipe_link?: string;
-        lastMade?: Date | null;
-      };
+    const {
+      name,
+      tags,
+      notes,
+      img_url,
+      img_public_id,
+      calories,
+      fat,
+      protein,
+      carbs,
+      recipe_link,
+      lastMade,
+    } = body as {
+      name?: string;
+      tags?: string[];
+      notes?: string[];
+      img_url?: string;
+      img_public_id?: string;
+      calories?: number;
+      fat?: number;
+      protein?: number;
+      carbs?: number;
+      recipe_link?: string;
+      lastMade?: Date | null;
+    };
 
     const updatedMeal = await prisma.meal.update({
       where: { id },
@@ -60,6 +75,10 @@ export async function PATCH(req: NextRequest, context: Context) {
         notes,
         img_file: img_url,
         img_public_id,
+        calories,
+        fat,
+        protein,
+        carbs,
         recipe_link,
         lastMade,
       },

@@ -58,6 +58,15 @@ export default function MealCardComponent({
         </CardTitle>
       </CardHeader>
 
+      {(meal.calories ?? meal.protein ?? meal.fat ?? meal.carbs) && (
+        <p className="text-xs text-muted-foreground mt-1 ml-4 mb-4">
+          {meal.calories ?? "-"} kcal Calories•
+          {meal.protein ?? "-"}g Protein•
+          {meal.fat ?? "-"}g Fat•
+          {meal.carbs ?? "-"}g Carbs
+        </p>
+      )}
+
       {meal.tags?.length ? (
         <CardContent className="px-4 pb-2 flex flex-wrap gap-1 text-xs text-muted-foreground">
           {meal.tags.map((tag) => (

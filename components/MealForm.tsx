@@ -67,6 +67,10 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
         notes: [],
         img_file: "",
         recipe_link: "",
+        calories: 0,
+        fat: 0,
+        protein: 0,
+        carbs: 0,
         userId: undefined,
       };
     }
@@ -78,6 +82,7 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
       lastMade: meal.lastMade || undefined,
       notes: meal.notes || [],
       img_file: meal.img_file === null ? "" : meal.img_file || "",
+      calories: meal.calories === null ? 0 : Number(meal.calories),
       recipe_link: meal.recipe_link === null ? "" : meal.recipe_link || "",
       userId: meal.userId || undefined,
     };
@@ -373,6 +378,81 @@ export default function MealFormComponent({ meal, onSubmit }: MealFormProps) {
             </FormItem>
           )}
         />
+
+        {/*  Macros */}
+        <div className="flex flex-row justify-between">
+          <FormField
+            control={form.control}
+            name="calories"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Calories</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Calories (kCal)"
+                    {...field}
+                    value={field.value || ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="carbs"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Carbs</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Carbs (g)"
+                    {...field}
+                    value={field.value || ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fat"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fat</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Fat (g)"
+                    {...field}
+                    value={field.value || ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="carbs"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Protein</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Protein (g)"
+                    {...field}
+                    value={field.value || ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         {uploadError && (
           <Alert variant="destructive" className="flex gap-2">
