@@ -85,6 +85,10 @@ async function main() {
         name: meal.name,
         tags: meal.tags,
         notes: meal.notes,
+        calories: meal.calories,
+        fat: meal.fat,
+        protein: meal.protein,
+        carbs: meal.carbs,
       },
     });
   }
