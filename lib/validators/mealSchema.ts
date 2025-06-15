@@ -25,6 +25,10 @@ export const mealFormSchema = z.object({
     },
     z.string().url("Recipe must be a valid URL").or(z.literal("")),
   ),
+  calories: z.number().int().nonnegative().optional(),
+  protein: z.number().nonnegative().optional(),
+  fat: z.number().nonnegative().optional(),
+  carbs: z.number().nonnegative().optional(),
   userId: z.string().optional(),
 });
 
